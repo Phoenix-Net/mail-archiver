@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 
 <head>
     <meta charset="utf-8" />
@@ -188,6 +188,58 @@
         observer.observe(document.body, {
             childList: true,
             subtree: true
+        });
+
+        // Theme switching functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+            
+            if (themeIcon && themeText) {
+                if (theme === 'dark') {
+                    themeIcon.className = 'bi bi-sun-fill me-2';
+                    themeText.textContent = 'Light Mode';
+                } else {
+                    themeIcon.className = 'bi bi-moon-fill me-2';
+                    themeText.textContent = 'Dark Mode';
+                }
+            }
+        }
+
+        // Initialize theme on page load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            updateThemeButton(theme);
+        }
+
+        // Initialize theme when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeTheme);
+        } else {
+            initializeTheme();
+        }
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            if (!localStorage.getItem('theme')) {
+                const theme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                updateThemeButton(theme);
+            }
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
